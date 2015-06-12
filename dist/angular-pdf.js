@@ -14,6 +14,7 @@
           pdfDoc = null,
           pageNum = (attrs.page ? attrs.page : 1),
           scale = attrs.scale > 0 ? attrs.scale : 1,
+          navigateWhileLoading = typeof(attrs.navigateWhileLoading) !== 'undefined' ? attrs.navigateWhileLoading : false,
           canvas = (attrs.canvasid ? document.getElementById(attrs.canvasid) : document.getElementById('pdf-canvas')),
           ctx = canvas.getContext('2d'),
           windowEl = angular.element($window);
@@ -28,6 +29,7 @@
         scope.pageNum = pageNum;
 
         scope.renderPage = function(num) {
+          scope.pageLoading = true;
           pdfDoc.getPage(num).then(function(page) {
             var viewport,
               pageWidthScale,
@@ -56,37 +58,47 @@
               if (typeof scope.onPageRender === 'function' ) {
                 scope.onPageRender();
               }
+                scope.pageLoading = false;
             });
           });
         };
 
         scope.goPrevious = function() {
-          if (scope.pageToDisplay <= 1) {
+          if (scope.pageToDisplay <= 1 || (scope.navigateWhileLoading && scope.pageLoading)) {
             return;
           }
           scope.pageNum = parseInt(scope.pageNum) - 1;
         };
 
         scope.goNext = function() {
-          if (scope.pageToDisplay >= pdfDoc.numPages) {
+          if (scope.pageToDisplay >= pdfDoc.numPages || (scope.navigateWhileLoading && scope.pageLoading)) {
             return;
           }
           scope.pageNum = parseInt(scope.pageNum) + 1;
         };
 
         scope.zoomIn = function() {
+          if (scope.navigateWhileLoading && scope.pageLoading) {
+              return;
+          }
           scale = parseFloat(scale) + 0.2;
           scope.renderPage(scope.pageToDisplay);
           return scale;
         };
 
         scope.zoomOut = function() {
+          if (scope.navigateWhileLoading && scope.pageLoading) {
+              return;
+          }
           scale = parseFloat(scale) - 0.2;
           scope.renderPage(scope.pageToDisplay);
           return scale;
         };
 
         scope.changePage = function() {
+          if (scope.navigateWhileLoading && scope.pageLoading) {
+              return;
+          }
           scope.renderPage(scope.pageToDisplay);
         };
 
