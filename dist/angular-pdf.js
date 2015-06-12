@@ -14,7 +14,7 @@
           pdfDoc = null,
           pageNum = (attrs.page ? attrs.page : 1),
           scale = attrs.scale > 0 ? attrs.scale : 1,
-          navigateWhileLoading = typeof(attrs.navigateWhileLoading) !== 'undefined' ? attrs.navigateWhileLoading : false,
+          navigateWhileLoading = typeof(attrs.navigateWhileLoading) !== 'undefined' ? attrs.navigateWhileLoading : true,
           canvas = (attrs.canvasid ? document.getElementById(attrs.canvasid) : document.getElementById('pdf-canvas')),
           ctx = canvas.getContext('2d'),
           windowEl = angular.element($window);
@@ -64,21 +64,21 @@
         };
 
         scope.goPrevious = function() {
-          if (scope.pageToDisplay <= 1 || (scope.navigateWhileLoading && scope.pageLoading)) {
+          if (scope.pageToDisplay <= 1 || (!scope.navigateWhileLoading && scope.pageLoading)) {
             return;
           }
           scope.pageNum = parseInt(scope.pageNum) - 1;
         };
 
         scope.goNext = function() {
-          if (scope.pageToDisplay >= pdfDoc.numPages || (scope.navigateWhileLoading && scope.pageLoading)) {
+          if (scope.pageToDisplay >= pdfDoc.numPages || (!scope.navigateWhileLoading && scope.pageLoading)) {
             return;
           }
           scope.pageNum = parseInt(scope.pageNum) + 1;
         };
 
         scope.zoomIn = function() {
-          if (scope.navigateWhileLoading && scope.pageLoading) {
+          if (!scope.navigateWhileLoading && scope.pageLoading) {
               return;
           }
           scale = parseFloat(scale) + 0.2;
@@ -87,7 +87,7 @@
         };
 
         scope.zoomOut = function() {
-          if (scope.navigateWhileLoading && scope.pageLoading) {
+          if (!scope.navigateWhileLoading && scope.pageLoading) {
               return;
           }
           scale = parseFloat(scale) - 0.2;
@@ -96,7 +96,7 @@
         };
 
         scope.changePage = function() {
-          if (scope.navigateWhileLoading && scope.pageLoading) {
+          if (!scope.navigateWhileLoading && scope.pageLoading) {
               return;
           }
           scope.renderPage(scope.pageToDisplay);
